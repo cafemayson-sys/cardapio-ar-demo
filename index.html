@@ -23,7 +23,7 @@
 <body>
 <header>
   <h1 style="margin:0">Restaurante Exemplo</h1>
-  <small>Toque no prato pra girar. "Ver na mesa" abre a câmera.</small>
+  <small>Arraste pra girar. "Ver na mesa" abre a câmera: aponte pra mesa de lado, mova devagar até o prato aparecer.</small>
 </header>
 
 <div id="cardapio"></div>
@@ -34,8 +34,8 @@
   // ponytail: cardápio inline; na etapa 2 vira fetch('cardapio.json').
   const cardapio = [
     { nome: "Espetinho misto", preco: "R$ 34,90",
-      descricao: "Carne, frango e legumes grelhados, acompanha farofa.",
-      modelo: "https://modelviewer.dev/shared-assets/models/shishkebab.glb" },
+      descricao: "Carne, frango e legumes grelhados, acompanha farofa. (28 cm, escala real)",
+      modelo: "modelos/espetinho.glb" },
   ];
 
   document.getElementById("cardapio").innerHTML = cardapio.map(p => `
