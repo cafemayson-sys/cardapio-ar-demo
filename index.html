@@ -1,0 +1,56 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cardápio AR (protótipo)</title>
+<script type="module" src="https://ajax.googleapis.com/ajax/libs/model-viewer/4.1.0/model-viewer.min.js"></script>
+<style>
+  body { margin: 0; font-family: system-ui, sans-serif; background: #0e2a30; color: #f4efe6; }
+  header { padding: 16px; }
+  header small { color: #d9a441; }
+  .prato { margin: 0 16px 24px; background: #15373f; border-radius: 12px; overflow: hidden; }
+  model-viewer { width: 100%; height: 320px; background: #1c4650; }
+  .info { padding: 12px 16px; }
+  .info h2 { margin: 0 0 4px; font-size: 1.1rem; }
+  .info p { margin: 0 0 8px; opacity: .85; font-size: .95rem; }
+  .preco { color: #d9a441; font-weight: 700; }
+  .ar-btn { position: absolute; bottom: 12px; right: 12px; background: #d9a441; color: #0e2a30;
+            border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700; }
+  .aviso { padding: 12px 16px; font-size: .85rem; opacity: .7; }
+</style>
+</head>
+<body>
+<header>
+  <h1 style="margin:0">Restaurante Exemplo</h1>
+  <small>Toque no prato pra girar. "Ver na mesa" abre a câmera.</small>
+</header>
+
+<div id="cardapio"></div>
+
+<p class="aviso">Protótipo, etapa 0. Modelo público de demonstração; os pratos reais entram na etapa 1.</p>
+
+<script type="module">
+  // ponytail: cardápio inline; na etapa 2 vira fetch('cardapio.json').
+  const cardapio = [
+    { nome: "Espetinho misto", preco: "R$ 34,90",
+      descricao: "Carne, frango e legumes grelhados, acompanha farofa.",
+      modelo: "https://modelviewer.dev/shared-assets/models/shishkebab.glb" },
+  ];
+
+  document.getElementById("cardapio").innerHTML = cardapio.map(p => `
+    <section class="prato">
+      <model-viewer src="${p.modelo}" alt="${p.nome}"
+        ar ar-modes="webxr scene-viewer quick-look" ar-scale="fixed" ar-placement="floor"
+        camera-controls auto-rotate shadow-intensity="1" loading="lazy">
+        <button slot="ar-button" class="ar-btn">Ver na mesa</button>
+      </model-viewer>
+      <div class="info">
+        <h2>${p.nome}</h2>
+        <p>${p.descricao}</p>
+        <span class="preco">${p.preco}</span>
+      </div>
+    </section>`).join("");
+</script>
+</body>
+</html>
