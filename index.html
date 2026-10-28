@@ -18,6 +18,9 @@
   .ar-btn { position: absolute; bottom: 12px; right: 12px; background: #d9a441; color: #0e2a30;
             border: 0; border-radius: 999px; padding: 10px 16px; font-weight: 700; }
   .aviso { padding: 12px 16px; font-size: .85rem; opacity: .7; }
+  .sem-ar { margin: 0 0 8px; color: #d9a441; font-size: .9rem; }
+  #diag { margin: 0 16px 24px; padding: 12px; background: #000; color: #9fe; font-size: .8rem;
+          white-space: pre-wrap; border-radius: 8px; }
 </style>
 </head>
 <body>
@@ -28,6 +31,8 @@
 
 <div id="cardapio"></div>
 
+<pre id="diag" hidden></pre>
+
 <p class="aviso">Protótipo, etapa 0. Modelo público de demonstração; os pratos reais entram na etapa 1.</p>
 
 <script type="module">
@@ -35,7 +40,7 @@
   const cardapio = [
     { nome: "Espetinho misto", preco: "R$ 34,90",
       descricao: "Carne, frango e legumes grelhados, acompanha farofa. (28 cm, escala real)",
-      modelo: "modelos/espetinho.glb?v=3" }, // ?v= muda a cada modelo novo: o cache do celular guarda o antigo
+      modelo: "modelos/espetinho-v4.glb" }, // versão no NOME: ?v= na URL vaza pro Scene Viewer como parâmetro
   ];
 
   document.getElementById("cardapio").innerHTML = cardapio.map(p => `
@@ -46,11 +51,34 @@
         <button slot="ar-button" class="ar-btn">Ver na mesa</button>
       </model-viewer>
       <div class="info">
+        <p class="sem-ar" hidden>Este celular não abriu a visão na mesa. O prato em 3D continua aqui em cima: arraste pra girar.</p>
         <h2>${p.nome}</h2>
         <p>${p.descricao}</p>
         <span class="preco">${p.preco}</span>
       </div>
     </section>`).join("");
+
+  // Diagnóstico só no link de teste (?diag): mostra o que o celular tem, pra não precisar perguntar.
+  const diag = new URLSearchParams(location.search).has("diag") ? document.getElementById("diag") : null;
+  const log = (t) => { if (diag) { diag.hidden = false; diag.textContent += t + "\n"; } };
+  if (diag) {
+    const ua = navigator.userAgent;
+    const navegador = /SamsungBrowser\/[\d.]+/.exec(ua)?.[0]
+      ?? (/; wv\)/.test(ua) ? "WebView (navegador embutido de outro app)" : /Chrome\/[\d.]+/.exec(ua)?.[0] ?? ua);
+    log("navegador: " + navegador);
+    log("android: " + (/Android [\d.]+/.exec(ua)?.[0] ?? "não"));
+    if (navigator.xr) {
+      navigator.xr.isSessionSupported("immersive-ar").then(
+        (s) => log("AR dentro do navegador (WebXR): " + (s ? "sim" : "não, vai tentar o Scene Viewer")),
+        () => log("AR dentro do navegador (WebXR): erro ao consultar"));
+    } else {
+      log("AR dentro do navegador (WebXR): navegador sem WebXR, vai tentar o Scene Viewer");
+    }
+  }
+  document.querySelectorAll("model-viewer").forEach((mv) => mv.addEventListener("ar-status", (e) => {
+    log("ar-status: " + e.detail.status);
+    if (e.detail.status === "failed") mv.closest(".prato").querySelector(".sem-ar").hidden = false;
+  }));
 </script>
 </body>
 </html>
